@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "finnhub-client"
 include(":app")
- 
+include(":domain")
