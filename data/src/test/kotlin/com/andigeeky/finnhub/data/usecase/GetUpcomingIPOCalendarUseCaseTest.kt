@@ -74,7 +74,7 @@ class GetUpcomingIPOCalendarUseCaseTest {
 
         val emissions = useCase(from, to).toList()
 
-        // Since cache fails, it skips the stale success emission
+        // Since the first cache call throws, the initial cached emission is skipped
         assertEquals(2, emissions.size)
         assertEquals(Resource.Loading<IPOCalendar>(null), emissions[0])
         assertEquals(Resource.Success(ipoCalendar), emissions[1])
