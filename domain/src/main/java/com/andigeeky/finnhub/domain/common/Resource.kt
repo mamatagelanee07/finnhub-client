@@ -1,10 +1,7 @@
 package com.andigeeky.finnhub.domain.common
 
-sealed class Resource<T>(
-    val data: T? = null,
-    val error: FinnError? = null,
-) {
-    class Success<T>(data: T) : Resource<T>(data)
-    class Loading<T>(data: T? = null) : Resource<T>(data)
-    class Error<T>(error: FinnError, data: T? = null) : Resource<T>(data, error)
+sealed interface Resource<out T> {
+    data class Loading<out T>(val data: T? = null) : Resource<T>
+    data class Success<out T>(val data: T, val isStaleData: Boolean = false) : Resource<T>
+    data class Error<out T>(val error: FinnError, val data: T? = null) : Resource<T>
 }
