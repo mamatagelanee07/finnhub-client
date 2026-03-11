@@ -52,8 +52,8 @@ class GetUpcomingIPOCalendarUseCaseTest {
 
         assertEquals(3, emissions.size)
         assertEquals(Resource.Loading<IPOCalendar>(null), emissions[0])
-        assertEquals(Resource.Success(ipoCalendar, isStaleData = true), emissions[1])
-        assertEquals(Resource.Success(ipoCalendar, isStaleData = false), emissions[2])
+        assertEquals(Resource.Success(ipoCalendar), emissions[1])
+        assertEquals(Resource.Success(ipoCalendar), emissions[2])
 
         coVerify(exactly = 1) { remoteDataSource.getIPOCalendar(from, to) }
         coVerify(exactly = 2) { cacheDataSource.getIPOCalendar(from, to) }
@@ -77,7 +77,7 @@ class GetUpcomingIPOCalendarUseCaseTest {
         // Since cache fails, it skips the stale success emission
         assertEquals(2, emissions.size)
         assertEquals(Resource.Loading<IPOCalendar>(null), emissions[0])
-        assertEquals(Resource.Success(ipoCalendar, isStaleData = false), emissions[1])
+        assertEquals(Resource.Success(ipoCalendar), emissions[1])
 
         coVerify(exactly = 1) { remoteDataSource.getIPOCalendar(from, to) }
         coVerify(exactly = 2) { cacheDataSource.getIPOCalendar(from, to) }

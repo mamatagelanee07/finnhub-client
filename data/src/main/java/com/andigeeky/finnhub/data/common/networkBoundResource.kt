@@ -5,6 +5,7 @@ import com.andigeeky.finnhub.domain.common.FinnError.Network
 import com.andigeeky.finnhub.domain.common.FinnError.Server
 import com.andigeeky.finnhub.domain.common.FinnError.Unknown
 import com.andigeeky.finnhub.domain.common.Resource
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
@@ -24,12 +25,12 @@ internal inline fun <Result> networkBoundResource(
     val cachedData = try {
         cache().firstOrNull()
     } catch (e: Exception) {
+        if (e is CancellationException) throw e
         null
     }
     if (cachedData != null) {
-        emit(Resource.Success(data = cachedData, isStaleData = true))
+        emit(Resource.Success(data = cachedData))
     }
-
     // 3. Network Sync (Runs exactly ONCE)
     try {
         when (val response = network()) {
@@ -37,15 +38,13 @@ internal inline fun <Result> networkBoundResource(
             is NetworkResponse.Failure -> emit(response.toErrorResource(cachedData))
         }
     } catch (e: Exception) {
+        if (e is CancellationException) throw e
         emit(e.toErrorResource(cachedData))
     }
     // 4. Final SSOT Stream (Live Updates)
-    // Map isStaleData = false here because data is now "Synced" with DB
-    emitAll(cache().map {
-        Resource.Success(data = it, isStaleData = false)
-    }
-    )
+    emitAll(cache().map { Resource.Success(data = it) })
 }.catch {
+    if (it is CancellationException) throw it
     emit(Resource.Error(Unknown(it.message)))
 }
 
