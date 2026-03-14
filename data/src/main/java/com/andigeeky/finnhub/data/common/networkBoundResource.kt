@@ -25,7 +25,7 @@ internal inline fun <Result> networkBoundResource(
     val cachedData = try {
         cache().firstOrNull()
     } catch (e: Exception) {
-        if (e is CancellationException) throw e
+        e.rethrowIfCancelled()
         null
     }
     if (cachedData != null) {
@@ -38,14 +38,28 @@ internal inline fun <Result> networkBoundResource(
             is NetworkResponse.Failure -> emit(response.toErrorResource(cachedData))
         }
     } catch (e: Exception) {
-        if (e is CancellationException) throw e
+        e.rethrowIfCancelled()
         emit(e.toErrorResource(cachedData))
     }
     // 4. Final SSOT Stream (Live Updates)
-    emitAll(cache().map { Resource.Success(data = it) })
+    emitAll(
+        cache()
+            .map { Resource.Success(data = it) }
+            .catch {
+                it.rethrowIfCancelled()
+                emit(Resource.Error(Unknown(it.message)))
+            }
+    )
 }.catch {
-    if (it is CancellationException) throw it
+    it.rethrowIfCancelled()
     emit(Resource.Error(Unknown(it.message)))
+}
+
+/**
+ * Extension to ensure cooperative cancellation in coroutines.
+ */
+internal fun Throwable.rethrowIfCancelled() {
+    if (this is CancellationException) throw this
 }
 
 /**
