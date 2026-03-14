@@ -18,28 +18,29 @@ internal inline fun <Result> networkBoundResource(
     crossinline network: suspend () -> NetworkResponse<Result>,
     crossinline saveToCache: suspend (Result) -> Unit,
 ): Flow<Resource<Result>> = flow<Resource<Result>> {
+    var latestData: Result? = null
     // 1. Immediate Loading (The Start)
     emit(Resource.Loading())
 
     // 2. Resilient Peek (Get Cache without crashing the whole flow)
-    val cachedData = try {
+    latestData = try {
         cache().firstOrNull()
     } catch (e: Exception) {
         e.rethrowIfCancelled()
         null
     }
-    if (cachedData != null) {
-        emit(Resource.Success(data = cachedData))
+    if (latestData != null) {
+        emit(Resource.Success(data = latestData))
     }
     // 3. Network Sync (Runs exactly ONCE)
     try {
         when (val response = network()) {
             is NetworkResponse.Success -> saveToCache(response.response)
-            is NetworkResponse.Failure -> emit(response.toErrorResource(cachedData))
+            is NetworkResponse.Failure -> emit(response.toErrorResource(latestData))
         }
     } catch (e: Exception) {
         e.rethrowIfCancelled()
-        emit(e.toErrorResource(cachedData))
+        emit(e.toErrorResource(latestData))
     }
     // 4. Final SSOT Stream (Live Updates)
     emitAll(
@@ -47,7 +48,7 @@ internal inline fun <Result> networkBoundResource(
             .map { Resource.Success(data = it) }
             .catch {
                 it.rethrowIfCancelled()
-                emit(Resource.Error(Unknown(it.message)))
+                emit(Resource.Error(Unknown(it.message), latestData))
             }
     )
 }.catch {
