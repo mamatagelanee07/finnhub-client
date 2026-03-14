@@ -13,7 +13,7 @@ internal class IPOCalendarRepositoryImpl(
     private val cacheDataSource: IPOCalendarCacheDataSource,
     private val remoteDataSource: IPOCalendarRemoteDataSource
 ) : IPOCalendarRepository {
-    override suspend fun getIPOCalendars(
+    override fun getIPOCalendars(
         from: LocalDate,
         to: LocalDate
     ): Flow<Resource<IPOCalendar>> {

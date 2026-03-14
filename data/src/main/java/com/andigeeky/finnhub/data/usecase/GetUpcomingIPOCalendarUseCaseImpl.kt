@@ -7,7 +7,7 @@ import java.time.LocalDate
 internal class GetUpcomingIPOCalendarUseCaseImpl(
     private val repository: IPOCalendarRepository
 ) : GetUpcomingIPOCalendarUseCase {
-    override suspend fun invoke(
+    override fun invoke(
         from: LocalDate,
         to: LocalDate
     ) = repository.getIPOCalendars(from, to)

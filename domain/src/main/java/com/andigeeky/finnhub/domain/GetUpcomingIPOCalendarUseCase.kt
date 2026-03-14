@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 interface GetUpcomingIPOCalendarUseCase {
-    suspend operator fun invoke(from: LocalDate, to: LocalDate): Flow<Resource<IPOCalendar>>
+    operator fun invoke(from: LocalDate, to: LocalDate): Flow<Resource<IPOCalendar>>
 }

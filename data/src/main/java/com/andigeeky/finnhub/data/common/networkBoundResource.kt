@@ -48,12 +48,12 @@ internal inline fun <Result> networkBoundResource(
             .map { Resource.Success(data = it) }
             .catch {
                 it.rethrowIfCancelled()
-                emit(Resource.Error(Unknown(it.message), latestData))
+                it.toErrorResource(latestData)
             }
     )
 }.catch {
     it.rethrowIfCancelled()
-    emit(Resource.Error(Unknown(it.message)))
+    it.toErrorResource(null)
 }
 
 /**
