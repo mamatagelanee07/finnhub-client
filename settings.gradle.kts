@@ -26,3 +26,4 @@ rootProject.name = "finnhub-client"
 include(":app")
 include(":domain")
 include(":data")
+include(":network")
