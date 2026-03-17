@@ -1,0 +1,24 @@
+{
+  "ipoCalendar": [
+    {
+      "date": "2026-01-01",
+      "exchange": "Exchange0",
+      "name": "Name0",
+      "numberOfShares": 0,
+      "price": "0.00-0.00",
+      "status": "expected",
+      "symbol": "Symbol0",
+      "totalSharesValue": 100000
+    },
+    {
+      "date": "2026-03-08",
+      "exchange": "Exchange1",
+      "name": "Name1",
+      "numberOfShares": 1000,
+      "price": "100.00-200.00",
+      "status": "priced",
+      "symbol": "Symbol1",
+      "totalSharesValue": 300000
+    }
+  ]
+}
