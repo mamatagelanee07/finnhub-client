@@ -18,17 +18,34 @@ internal class PriceRangeSerializer : KSerializer<PriceRange> {
     override fun serialize(
         encoder: Encoder,
         value: PriceRange
-    ) = encoder.encodeString("${value.min}-${value.max}")
+    ) {
+        val output = when {
+            value.min == null && value.max == null -> ""
+            value.min == value.max -> "${value.min}"
+            else -> "${value.min ?: ""}-${value.max ?: ""}"
+        }
+        encoder.encodeString(output)
+    }
 
     override fun deserialize(decoder: Decoder): PriceRange {
-        val parts = decoder.decodeString().split("-")
-        if (parts.size == 2) {
-            return PriceRange(
-                min = parts[0].trim().toDouble(),
-                max = parts[1].trim().toDouble()
-            )
-        } else {
-            throw IllegalArgumentException("Invalid price range format")
+        val input = decoder.decodeString().trim()
+        if (input.isBlank() || input == "null") return PriceRange(null, null)
+
+        // Handle both "-" and " - " as separators
+        val parts = input.split("-").map { it.trim() }.filter { it.isNotEmpty() }
+        
+        return when (parts.size) {
+            1 -> {
+                val price = parts[0].toDoubleOrNull()
+                PriceRange(min = price, max = price)
+            }
+            2 -> {
+                PriceRange(
+                    min = parts[0].toDoubleOrNull(),
+                    max = parts[1].toDoubleOrNull()
+                )
+            }
+            else -> PriceRange(null, null)
         }
     }
 }

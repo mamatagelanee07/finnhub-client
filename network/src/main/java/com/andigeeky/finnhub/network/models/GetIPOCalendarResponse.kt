@@ -25,21 +25,21 @@ internal data class IPOCalendarRemote(
     @JsonNames("date")
     val date: LocalDate?,
     @JsonNames("exchange")
-    val exchange: String,
+    val exchange: String?,
     @JsonNames("name")
-    val name: String,
+    val name: String?,
     @JsonNames("numberOfShares")
-    val numberOfShares: Long,
+    val numberOfShares: Long?,
     @Serializable(with = PriceRangeSerializer::class)
     @JsonNames("price")
-    val price: PriceRange,
+    val price: PriceRange?,
     @Serializable(IPOStatusSerializer::class)
     @JsonNames("status")
-    val status: IPOStatus,
+    val status: IPOStatus?,
     @JsonNames("symbol")
-    val symbol: String,
+    val symbol: String?,
     @JsonNames("totalSharesValue")
-    val totalSharesValue: Long,
+    val totalSharesValue: Long?,
 )
 
 internal fun GetIPOCalendarResponse.toDomain() = IPOCalendar(

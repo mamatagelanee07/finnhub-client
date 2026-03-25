@@ -7,7 +7,7 @@ import retrofit2.http.Query
 import java.time.LocalDate
 
 internal interface FinnhubAPI {
-    @GET("/calendar/ipo")
+    @GET("api/v1/calendar/ipo")
     suspend fun getIPOCalendar(
         @Query("from") from: LocalDate,
         @Query("to") to: LocalDate

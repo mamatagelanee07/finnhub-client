@@ -33,8 +33,10 @@ internal suspend inline fun <Out, In> networkCall(
             else -> NetworkResponse.Failure.UnexpectedError(errorMessage)
         }
     } catch (e: IOException) {
+        e.printStackTrace()
         NetworkResponse.Failure.NoInternet(e.message ?: "No internet connection")
     } catch (e: Exception) {
+        e.printStackTrace()
         NetworkResponse.Failure.UnexpectedError(e.message ?: "Unknown error")
     }
 }

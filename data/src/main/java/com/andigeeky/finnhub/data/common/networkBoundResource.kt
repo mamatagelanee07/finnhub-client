@@ -6,11 +6,13 @@ import com.andigeeky.finnhub.domain.common.FinnError.Server
 import com.andigeeky.finnhub.domain.common.FinnError.Unknown
 import com.andigeeky.finnhub.domain.common.Resource
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 internal inline fun <Result> networkBoundResource(
@@ -54,7 +56,7 @@ internal inline fun <Result> networkBoundResource(
 }.catch {
     it.rethrowIfCancelled()
     it.toErrorResource(null)
-}
+}.flowOn(Dispatchers.IO)
 
 /**
  * Extension to ensure cooperative cancellation in coroutines.

@@ -3,9 +3,13 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 android {
     namespace = "com.andigeeky.finnhub.network"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 26
@@ -24,8 +28,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
@@ -38,6 +42,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization)
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.core)

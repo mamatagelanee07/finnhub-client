@@ -1,6 +1,6 @@
 package com.andigeeky.finnhub.network.common
 
-import com.andigeeky.finnhub.network.di.API_KEY_PROPERTY
+import com.andigeeky.finnhub.domain.common.DomainKeys.API_KEY_PROPERTY
 import com.andigeeky.finnhub.network.di.network_module
 import mockwebserver3.MockWebServer
 import okhttp3.HttpUrl
