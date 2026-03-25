@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 interface IPOCalendarCacheDataSource {
-    suspend fun getIPOCalendar(
+    fun getIPOCalendar(
         from: LocalDate,
         to: LocalDate
     ): Flow<IPOCalendar>
