@@ -5,15 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.andigeeky.finnhub.common.getMessage
 import com.andigeeky.finnhub.domain.GetUpcomingIPOCalendarUseCase
 import com.andigeeky.finnhub.domain.common.Resource
-import com.andigeeky.finnhub.domain.models.IPOCalendar
 import com.andigeeky.finnhub.ipoCalendar.model.IPOCalendarState
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 
@@ -30,7 +30,27 @@ class IPOCalendarViewModel(
             getIPOCalendarUseCase(
                 from = LocalDate.now().minusDays(10),
                 to = LocalDate.now()
-            ).map { map(it) }
+            )
+        }
+        .scan(IPOCalendarState.DEFAULT) { previousState, result ->
+            when (result) {
+                is Resource.Loading -> previousState.copy(
+                    isLoading = true,
+                    error = null
+                )
+
+                is Resource.Success -> IPOCalendarState(
+                    data = result.data.events.toImmutableList(),
+                    isLoading = false,
+                    error = null
+                )
+
+                is Resource.Error -> previousState.copy(
+                    isLoading = false,
+                    error = result.error.getMessage(),
+                    data = result.data?.events?.toImmutableList() ?: previousState.data
+                )
+            }
         }
         .stateIn(
             scope = viewModelScope,
@@ -40,19 +60,5 @@ class IPOCalendarViewModel(
 
     fun reload() {
         reloadTrigger.tryEmit(Unit)
-    }
-
-    private fun map(result: Resource<IPOCalendar>) = when (result) {
-        is Resource.Error<IPOCalendar> -> IPOCalendarState(
-            error = result.error.getMessage()
-        )
-
-        is Resource.Loading<IPOCalendar> -> IPOCalendarState(
-            isLoading = true
-        )
-
-        is Resource.Success<IPOCalendar> -> IPOCalendarState(
-            data = result.data.events
-        )
     }
 }

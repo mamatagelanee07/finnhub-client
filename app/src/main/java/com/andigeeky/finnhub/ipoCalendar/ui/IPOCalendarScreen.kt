@@ -12,6 +12,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,9 @@ import com.andigeeky.finnhub.domain.models.IPOStatus
 import com.andigeeky.finnhub.domain.models.PriceRange
 import com.andigeeky.finnhub.ipoCalendar.model.IPOCalendarState
 import com.andigeeky.finnhub.ui.theme.FinnhubclientTheme
+import com.skydoves.compose.stability.runtime.TraceRecomposition
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 
@@ -33,11 +37,12 @@ fun IPOCalendarScreen(
     viewModel: IPOCalendarViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val reload = remember(viewModel) {
+        { viewModel.reload() }
+    }
     IPOCalendarComponent(
         state = state,
-        reload = {
-            viewModel.reload()
-        }
+        reload = reload
     )
 }
 
@@ -69,16 +74,22 @@ fun IPOCalendarComponent(
             )
         }
         state.data?.let {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(it) { item ->
-                    Text(
-                        text = item.symbol.orEmpty(),
-                        color = Color.Black,
-                    )
-                }
-            }
+            IPOEventList(it)
+        }
+    }
+}
+
+@TraceRecomposition
+@Composable
+private fun IPOEventList(events: ImmutableList<IPOEvent>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(events) { item ->
+            Text(
+                text = item.symbol.orEmpty(),
+                color = Color.Black,
+            )
         }
     }
 }
@@ -99,7 +110,7 @@ class IPOCalendarComponentPreviewProvider : PreviewParameterProvider<IPOCalendar
                     numberOfShares = 1000000L * i,
                     totalSharesValue = 15000000L * i
                 )
-            }
+            }.toImmutableList()
         )
     )
 }
