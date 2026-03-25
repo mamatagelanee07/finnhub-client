@@ -19,9 +19,9 @@ internal class PriceRangeSerializer : KSerializer<PriceRange> {
         encoder: Encoder,
         value: PriceRange
     ) {
-        val output = when {
-            value.min == null && value.max == null -> ""
-            value.min == value.max -> "${value.min}"
+        val output = when (value.min) {
+            null if value.max == null -> ""
+            value.max -> "${value.min}"
             else -> "${value.min ?: ""}-${value.max ?: ""}"
         }
         encoder.encodeString(output)
